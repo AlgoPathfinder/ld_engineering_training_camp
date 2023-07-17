@@ -1,3 +1,12 @@
+/*
+ * @Author: Ang.Lee.
+ * @Date: 2023-07-13 16:52:31
+ * @LastEditTime: 2023-07-17 22:53:42
+ * @LastEditors: Ang.Lee.
+ * @Description: 
+ * @FilePath: \lidar_data_demo_linux\src\lidar_data_common\lidar_data_common.h
+ * 
+ */
 #pragma once
 
 #include <iostream>
