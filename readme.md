@@ -8,7 +8,7 @@
 ### You need install OpenCV and Cmake first
 On ubuntu you can get opencv as
 ```
-sudo apt-get install lib-opencvdev
+sudo apt-get install libopencv-dev
 ```
 
 ## Usage
@@ -16,6 +16,7 @@ sudo apt-get install lib-opencvdev
 ```bash
 git clone https://github.com/AlgoPathfinder/ld_engineering_training_camp.git
 cd ld_engineering_training_camp
+chmod 777 auto_build.sh
 ./auto_build.sh
 cd bulid
 ./lidar_data_show

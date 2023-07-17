@@ -5,6 +5,7 @@
 #include <fstream>
 #include <cmath>
 
+//雷达点，每个点包含角度、距离、置信度
 struct LidarDataPoint
 {
 	float angle;
@@ -12,6 +13,7 @@ struct LidarDataPoint
 	float conf;
 };
 
+//实数点
 struct PointXY
 {
 	float x;
@@ -28,18 +30,21 @@ float GetPointDistanceSqr(PointXY a, PointXY b)
 	return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
 }
 
+//雷达数据帧
 struct LidarDataFrame
 {
 	int64_t time_interval;
 	std::vector<LidarDataPoint> data;
 };
 
+//转为点云的雷达数据帧
 struct PointDataFrame
 {
 	int64_t time_interval;
 	std::vector<PointXY> data;
 };
 
+//雷达数据集
 class LidarDataFrameList
 {
 public:
@@ -78,6 +83,7 @@ public:
 	//SaveDataToFile();
 };
 
+//雷达数据处理，包含坐标转换，简单滤波，降采样等
 class LidarDataTransform
 {
 private:
@@ -95,6 +101,7 @@ public:
 		return point_data;
 	}
 
+	//极坐标转直角坐标
 	int DataTransform()
 	{
 		point_data.time_interval = lidar_data.time_interval;
@@ -110,7 +117,7 @@ public:
 		return 0;
 	}
 
-
+	//去除密集点
 	int DataGridFilter(float dis)
 	{
 		if (point_data.data.size() <= 0)
@@ -131,6 +138,7 @@ public:
 		return 0;
 	}
 
+	//间隔k个点采样
 	int DataDownSample(int k)
 	{
 		if (point_data.data.size() <= 0)
@@ -147,6 +155,7 @@ public:
 		return 0;
 	}
 
+	//遮挡部分雷达角度，k为遮挡比例
 	int CutData(float k)
 	{
 		if (point_data.data.size() <= 0)

@@ -1,14 +1,14 @@
 ﻿/*
  * @Author: Ang.Lee.
  * @Date: 2023-07-13 16:52:31
- * @LastEditTime: 2023-07-13 18:14:38
+ * @LastEditTime: 2023-07-17 22:13:29
  * @LastEditors: Ang.Lee.
  * @Description: 
  * @FilePath: \lidar_data_demo_linux\src\lidar_data_show\lidar_data_show.cpp
  * 
  */
-// lidar_data_show.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
-//
+
+//此程序从磁盘中读取雷达数据文件并使用OpenCV显示
 
 #include <iostream>
 #include "opencv2/opencv.hpp"
@@ -17,26 +17,34 @@
 int main()
 {
 	LidarDataFrameList frame_data_test;
+
+	//从文件中读取雷达数据
 	frame_data_test.ReadDataFromFile("../data/lidar_data007.txt");
 	std::cout << "total frame: " << frame_data_test.get_frame_size() << std::endl;
 
 	int count = 0;
 	while (count < frame_data_test.get_frame_size())
 	{
+		//将雷达数据由极坐标系转为直角坐标系
 		LidarDataTransform data_tran_test;
 		data_tran_test.set_lidar_data(frame_data_test.data_list[count]);
 		data_tran_test.DataTransform();
-		data_tran_test.DataGridFilter(0.05);
+		
+		//data_tran_test.DataGridFilter(0.05);
 		//data_tran_test.DataDownSample(5);
 
+		//定义显示图像长和宽
 		const int show_w = 400;
 		const int show_h = 300;
+
+		//新建图像对象，格式为3通道BGR图像，每通道8位，并初始化为0
 		cv::Mat points_show(show_h, show_w, CV_8UC3);
 		memset(&points_show.data[0], 255, show_h * show_w * 3);
 
 		PointDataFrame data_show_frame = data_tran_test.get_point_data();
 		for (int i = 0; i < data_show_frame.data.size(); i++)
 		{
+			//计算每个像素点的图像坐标
 			int idx_x = data_show_frame.data[i].x *15;
 			idx_x = idx_x + show_w / 2;
 			int idx_y = data_show_frame.data[i].y *15;
@@ -49,7 +57,7 @@ int main()
 		}
 
 		cv::imshow("lidar frame", points_show);
-		cv::waitKey(200);
+		cv::waitKey(100);
 		count++;
 	}
 	return 0;
