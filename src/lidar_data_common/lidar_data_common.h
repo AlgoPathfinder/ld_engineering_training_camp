@@ -103,6 +103,7 @@ public:
 	int set_lidar_data(LidarDataFrame lidar_data_in)
 	{
 		lidar_data = lidar_data_in;
+		DataTransform();
 		return 0;
 	}
 	PointDataFrame get_point_data()
@@ -186,3 +187,26 @@ public:
 	}
 
 };
+
+double CalCulatePointDataCost(PointDataFrame first_frame, PointDataFrame new_frame, float x, float y, float rad)
+{
+	double total_value = 0;
+	for (int i = 0; i < new_frame.data.size(); i++)
+	{
+		PointXY tran_point;
+		tran_point.x = new_frame.data[i].x * cos(rad) + new_frame.data[i].y * sin(rad) + x;
+		tran_point.y = new_frame.data[i].y * cos(rad) - new_frame.data[i].x * sin(rad) + y;
+
+		float min_dis = 1000;
+		for (int j = 0; j < first_frame.data.size(); j++)
+		{
+			float dis = GetPointDistance(tran_point, first_frame.data[j]);
+			if (dis < min_dis)
+			{
+				min_dis = dis;
+			}
+		}
+		total_value += min_dis;
+	}
+	return total_value;
+}
