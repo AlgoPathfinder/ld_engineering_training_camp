@@ -34,19 +34,24 @@ ${OpenCV_INCLUDE_DIRS}
 )
 
 file(GLOB  LDLIDAR_DATA_SHOW ${CMAKE_CURRENT_SOURCE_DIR}/src/lidar_data_show/*.cpp)
+file(GLOB  LDLIDAR_DATA_NAIVE_ROTATION_MATCHING ${CMAKE_CURRENT_SOURCE_DIR}/src/lidar_data_naive_rotation_matching/*.cpp)
+file(GLOB  LDLIDAR_DATA_NAIVE_TRANSLATION_MATCHING ${CMAKE_CURRENT_SOURCE_DIR}/src/lidar_data_naive_translation_matching/*.cpp)
+
 #file(GLOB  LDLIDAR_DATA_MATCHING ${CMAKE_CURRENT_SOURCE_DIR}/src/lidar_data_matching/*.cpp)
 #file(GLOB  LDLIDAR_DATA_MATCH_POINTS_MAP ${CMAKE_CURRENT_SOURCE_DIR}/src/lidar_data_match_points_map/*.cpp)
-#file(GLOB  LDLIDAR_DRI_LOGGER ${CMAKE_CURRENT_SOURCE_DIR}/../ldlidar_driver/src/logger/*.cpp)
-#file(GLOB  LDLIDAR_DRI_NETWORK ${CMAKE_CURRENT_SOURCE_DIR}/../ldlidar_driver/src/networkcom/*.cpp)
-#file(GLOB  LDLIDAR_DRI_SERIAL ${CMAKE_CURRENT_SOURCE_DIR}/../ldlidar_driver/src/serialcom/*.cpp)
 
-#file(GLOB  MAIN_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/linux_demo/*.cpp)
-#file(GLOB  PRESSURE_TEST ${CMAKE_CURRENT_SOURCE_DIR}/src/pressure_test/*.cpp)
-#file(GLOB  LIDAR_SHOW_DEMO ${CMAKE_CURRENT_SOURCE_DIR}/src/lidar_show_demo/*.cpp)
 
 add_executable(lidar_data_show
 	${LDLIDAR_DATA_SHOW})	
 target_link_libraries(lidar_data_show ${OpenCV_LIBS})
+
+add_executable(lidar_data_naive_rotation_matching
+	${LDLIDAR_DATA_NAIVE_ROTATION_MATCHING})	
+target_link_libraries(lidar_data_naive_rotation_matching ${OpenCV_LIBS})
+
+add_executable(lidar_data_naive_translation_matching
+	${LDLIDAR_DATA_NAIVE_TRANSLATION_MATCHING})	
+target_link_libraries(lidar_data_naive_translation_matching ${OpenCV_LIBS})
 
 #add_executable(lidar_data_matching 
 #	${LDLIDAR_DATA_MATCHING})
