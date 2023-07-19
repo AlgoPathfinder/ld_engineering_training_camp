@@ -1,7 +1,7 @@
 ﻿/*
  * @Author: Ang.Lee.
  * @Date: 2023-07-19 16:48:34
- * @LastEditTime: 2023-07-19 17:08:32
+ * @LastEditTime: 2023-07-19 17:29:41
  * @LastEditors: Ang.Lee.
  * @Description: 
  * @FilePath: \lidar_data_demo_linux\src\lidar_data_naive_rotation_matching\lidar_data_naive_rotation_matching.cpp
@@ -14,7 +14,7 @@
 int main()
 {
 	LidarDataFrameList frame_data_test;
-	frame_data_test.ReadDataFromFile("../lidar_data003.txt");
+	frame_data_test.ReadDataFromFile("../data/lidar_data003.txt");
 	std::cout << "total frame: " << frame_data_test.get_frame_size() << std::endl;
 
 	int count = 0;

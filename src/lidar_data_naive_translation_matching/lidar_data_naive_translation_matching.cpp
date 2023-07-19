@@ -14,7 +14,7 @@
 int main()
 {
 	LidarDataFrameList frame_data_test;
-	frame_data_test.ReadDataFromFile("../lidar_data001.txt");
+	frame_data_test.ReadDataFromFile("../data/lidar_data001.txt");
 	std::cout << "total frame: " << frame_data_test.get_frame_size() << std::endl;
 
 	int count = 0;
