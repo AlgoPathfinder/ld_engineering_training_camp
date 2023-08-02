@@ -1,7 +1,7 @@
 ﻿/*
  * @Author: Ang.Lee.
  * @Date: 2023-07-21 18:01:51
- * @LastEditTime: 2023-07-25 22:15:12
+ * @LastEditTime: 2023-08-02 22:39:58
  * @LastEditors: Ang.Lee.
  * @Description: 
  * @FilePath: \lidar_data_demo_linux\src\lidar_data_matching\lidar_data_matching.cpp
@@ -15,7 +15,7 @@
 int main()
 {
 	LidarDataFrameList frame_data_test;
-	frame_data_test.ReadDataFromFile("../data/lidar_data010.txt");
+	frame_data_test.ReadDataFromFile("../data/lidar_data008.txt");
 	std::cout << "total frame: " << frame_data_test.get_frame_size() << std::endl;
 
 	int count = 0;
@@ -137,19 +137,6 @@ int main()
 		if ((idx_x < show_w) && (idx_y < show_h) && (idx_x >= 0) && (idx_y >= 0))
 		{
 			cv::circle(points_show, cv::Point(idx_x, idx_y), 1, cv::Scalar(255, 0, 0));
-		}
-
-		for (size_t i = 0; i < new_frame.data.size(); i++)
-		{
-			int idx_x = (new_frame.data[i].x * cos(car_a) + new_frame.data[i].y * sin(car_a) + car_x) * 15;
-			idx_x = idx_x + show_w / 2;
-			int idx_y = (new_frame.data[i].y * cos(car_a) - new_frame.data[i].x * sin(car_a) + car_y) * 15;
-			idx_y = -idx_y + show_h / 2;
-			if ((idx_x < show_w) && (idx_y < show_h) && (idx_x >= 0) && (idx_y >= 0))
-			{
-				cv::circle(points_show, cv::Point(idx_x, idx_y), 1, cv::Scalar(0, 0, 255));
-			}
-
 		}
 
 		cv::imshow("trojectory", points_show);
