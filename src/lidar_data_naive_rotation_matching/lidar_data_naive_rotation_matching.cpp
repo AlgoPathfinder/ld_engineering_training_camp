@@ -80,8 +80,8 @@ int main()
 		idx_y = -idx_y + show_h / 2;
 
 		//计算雷达图形坐标（中间的直线）
-		float car_top_x = 0.4 * cos(car_a) + 0 * sin(car_a) + car_x;
-		float car_top_y = 0 * cos(car_a) - 0.4 * sin(car_a) + car_y;
+		float car_top_x = 0.8 * cos(car_a) + 0 * sin(car_a) + car_x;
+		float car_top_y = 0 * cos(car_a) - 0.8 * sin(car_a) + car_y;
 
 		int cat_top_idx_x = car_top_x * to_map_scale;
 		cat_top_idx_x = cat_top_idx_x + show_w / 2;
@@ -96,7 +96,7 @@ int main()
 		}
 
 		//将最新雷达数据转为全局坐标系（以首帧为基准），并显示
-		for (int i = 0; i < new_frame.data.size(); i++)
+		for (size_t i = 0; i < new_frame.data.size(); i++)
 		{
 			int idx_x = (new_frame.data[i].x * cos(car_a) + new_frame.data[i].y * sin(car_a) + car_x) * to_map_scale;
 			idx_x = idx_x + show_w / 2;

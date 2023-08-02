@@ -1,7 +1,7 @@
 /*
  * @Author: Ang.Lee.
  * @Date: 2023-07-13 16:52:31
- * @LastEditTime: 2023-07-17 22:53:42
+ * @LastEditTime: 2023-08-02 20:50:08
  * @LastEditors: Ang.Lee.
  * @Description: 
  * @FilePath: \lidar_data_demo_linux\src\lidar_data_common\lidar_data_common.h
@@ -99,6 +99,8 @@ private:
 	PointDataFrame point_data;
 	LidarDataFrame lidar_data;
 
+
+
 public:
 	int set_lidar_data(LidarDataFrame lidar_data_in)
 	{
@@ -117,7 +119,7 @@ public:
 		point_data.time_interval = lidar_data.time_interval;
 		point_data.data.clear();
 
-		for (int i = 0; i < lidar_data.data.size(); i++)
+		for (size_t i = 0; i < lidar_data.data.size(); i++)
 		{
 			PointXY point_tmp;
 			point_tmp.x = lidar_data.data[i].dis * cos(lidar_data.data[i].angle / 180.0 * 3.14159);
@@ -137,7 +139,7 @@ public:
 		PointDataFrame point_data_tmp;
 		point_data_tmp.time_interval = point_data.time_interval;
 		point_data_tmp.data.push_back(point_data.data[0]);
-		for (int i = 1; i < point_data.data.size(); i++)
+		for (size_t i = 1; i < point_data.data.size(); i++)
 		{
 			if (GetPointDistance(point_data.data[i], point_data_tmp.data[point_data_tmp.data.size() - 1]) > dis)
 			{
@@ -157,7 +159,7 @@ public:
 		}
 		PointDataFrame point_data_tmp;
 		point_data_tmp.time_interval = point_data.time_interval;
-		for (int i = 0; i < point_data.data.size(); i += k)
+		for (size_t i = 0; i < point_data.data.size(); i += k)
 		{
 			point_data_tmp.data.push_back(point_data.data[i]);
 		}
@@ -174,11 +176,11 @@ public:
 		}
 		PointDataFrame point_data_tmp;
 		point_data_tmp.time_interval = point_data.time_interval;
-		for (int i = 0; i < point_data.data.size() * k / 2; i++)
+		for (size_t i = 0; i < point_data.data.size() * k / 2; i++)
 		{
 			point_data_tmp.data.push_back(point_data.data[i]);
 		}
-		for (int i = point_data.data.size() - point_data.data.size() * k / 2; i < point_data.data.size(); i++)
+		for (size_t i = point_data.data.size() - point_data.data.size() * k / 2; i < point_data.data.size(); i++)
 		{
 			point_data_tmp.data.push_back(point_data.data[i]);
 		}
@@ -191,14 +193,14 @@ public:
 double CalCulatePointDataCost(PointDataFrame first_frame, PointDataFrame new_frame, float x, float y, float rad)
 {
 	double total_value = 0;
-	for (int i = 0; i < new_frame.data.size(); i++)
+	for (size_t i = 0; i < new_frame.data.size(); i++)
 	{
 		PointXY tran_point;
 		tran_point.x = new_frame.data[i].x * cos(rad) + new_frame.data[i].y * sin(rad) + x;
 		tran_point.y = new_frame.data[i].y * cos(rad) - new_frame.data[i].x * sin(rad) + y;
 
 		float min_dis = 1000;
-		for (int j = 0; j < first_frame.data.size(); j++)
+		for (size_t j = 0; j < first_frame.data.size(); j++)
 		{
 			float dis = GetPointDistance(tran_point, first_frame.data[j]);
 			if (dis < min_dis)
@@ -209,4 +211,42 @@ double CalCulatePointDataCost(PointDataFrame first_frame, PointDataFrame new_fra
 		total_value += min_dis;
 	}
 	return total_value;
+}
+
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+#ifndef M_2PI
+#define M_2PI 6.2831853071795864769
+#endif
+
+#ifndef DEG2RAD
+#define DEG2RAD(x) ((x) * M_PI / 180.0)
+#endif 
+
+#ifndef RAD2DEG
+#define RAD2DEG(x) ((x) * 180.0 / M_PI)
+#endif
+
+template <class T>
+inline void wrapTo2PiInPlace(T& a)//->[0,2PI)
+{
+	bool was_neg = a < 0;
+	a = fmod(a, static_cast<T>(2.0 * M_PI));
+	if (was_neg) a += static_cast<T>(2.0 * M_PI);
+}
+
+template <class T>
+inline T wrapTo2Pi(T a)
+{
+	wrapTo2PiInPlace(a);
+	return a;
+}
+
+template <class T>
+inline T wrapToPi(T a)//->[-Pi,pi)
+{
+	return wrapTo2Pi(a + static_cast<T>(M_PI)) - static_cast<T>(M_PI);
 }

@@ -45,7 +45,7 @@ int main()
 		memset(&points_show.data[0], 255, show_h * show_w * 3);
 
 		PointDataFrame data_show_frame = data_tran_test.get_point_data();
-		for (int i = 0; i < data_show_frame.data.size(); i++)
+		for (size_t i = 0; i < data_show_frame.data.size(); i++)
 		{
 			//计算每个像素点的图像坐标
 			int idx_x = data_show_frame.data[i].x *to_map_scale;

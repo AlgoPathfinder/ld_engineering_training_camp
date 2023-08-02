@@ -5,7 +5,7 @@
 ### Reference codes of ld engineering training camp in C++ language.
 
 ## Requirements
-### You need install OpenCV and Cmake first
+### You should install OpenCV and Cmake first
 On ubuntu you can get opencv as
 ```
 sudo apt-get install libopencv-dev
