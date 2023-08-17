@@ -4,23 +4,22 @@
  * @LastEditTime: 2023-08-02 22:39:58
  * @LastEditors: Ang.Lee.
  * @Description: 
- * @FilePath: \lidar_data_demo_linux\src\lidar_data_matching\lidar_data_matching.cpp
  * 
  */
 
 #include <iostream>
-#include "../lidar_data_common/lidar_data_common.h"
+#include "lidar_data_common.h"
 #include <opencv2/opencv.hpp>
 
 int main()
 {
-	LidarDataFrameList frame_data_test;
-	frame_data_test.ReadDataFromFile("../data/lidar_data008.txt");
-	std::cout << "total frame: " << frame_data_test.get_frame_size() << std::endl;
+	LidarDataFrameList frame_data_list;
+	frame_data_list.ReadDataFromFile("../data/lidar_data008.txt");
+	std::cout << "total frame: " << frame_data_list.get_frame_size() << std::endl;
 
 	int count = 0;
 
-	PointDataFrame new_frame;
+	PointDataFrame new_point_frame;
 	PointDataFrame last_frame;
 
 	double car_x = 0;
@@ -32,22 +31,22 @@ int main()
 	cv::Mat points_show(show_h, show_w, CV_8UC3);
 	memset(&points_show.data[0], 255, show_h * show_w * 3);
 
-	while (count < frame_data_test.get_frame_size())
+	while (count < frame_data_list.get_frame_size())
 	{
-		LidarDataTransform data_tran_test;
-		data_tran_test.set_lidar_data(frame_data_test.data_list[count]);
-		data_tran_test.DataTransform();
-		data_tran_test.DataGridFilter(0.02);
-		//data_tran_test.DataDownSample(1);
+		LidarDataTransform data_trans;
+		data_trans.set_lidar_data(frame_data_list.data_list[count]);
+		data_trans.DataTransform();
+		data_trans.DataGridFilter(0.02);
+		//data_trans.DataDownSample(1);
 
 		if (count == 0)
 		{
-			last_frame = data_tran_test.get_point_data();
+			last_frame = data_trans.get_point_data();
 			count++;
 			continue;
 		}
 
-		new_frame = data_tran_test.get_point_data();
+		new_point_frame = data_trans.get_point_data();
 
 		int step = 1;
 		float xy_step=0.05;
@@ -102,7 +101,7 @@ int main()
 					break;
 				}
 
-				double cost_value=CalCulatePointDataCost(last_frame, new_frame, new_x, new_y, new_a/180.0*3.14159);
+				double cost_value=CalCulatePointDataCost(last_frame, new_point_frame, new_x, new_y, new_a/180.0*3.14159);
 				if (cost_value < min_value)
 				{
 					dst_x = new_x;
@@ -121,8 +120,8 @@ int main()
 			ang_step /= 2;
 		}
 
-		car_x += dst_x * cos(car_a) + dst_y * sin(car_a);
-		car_y += dst_y * cos(car_a) - dst_x * sin(car_a);
+		car_x += dst_x * cos(car_a) - dst_y * sin(car_a);
+		car_y += dst_y * cos(car_a) + dst_x * sin(car_a);
 
 		car_a += dst_a/180.0*3.14159;
 
@@ -142,7 +141,7 @@ int main()
 		cv::imshow("trojectory", points_show);
 		cv::waitKey(1);
 
-		last_frame = new_frame;
+		last_frame = new_point_frame;
 		count++;
 	}
 	return 0;

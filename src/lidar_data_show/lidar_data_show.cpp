@@ -4,7 +4,6 @@
  * @LastEditTime: 2023-07-19 16:53:20
  * @LastEditors: Ang.Lee.
  * @Description: 
- * @FilePath: \lidar_data_demo_linux\src\lidar_data_show\lidar_data_show.cpp
  * 
  */
 
@@ -12,27 +11,27 @@
 
 #include <iostream>
 #include "opencv2/opencv.hpp"
-#include "../lidar_data_common/lidar_data_common.h"
+#include "lidar_data_common.h"
 
 int main()
 {
-	LidarDataFrameList frame_data_test;
+	LidarDataFrameList frame_data_list;
 
 	//从文件中读取雷达数据
-	frame_data_test.ReadDataFromFile("../data/lidar_data007.txt");
-	std::cout << "total frame: " << frame_data_test.get_frame_size() << std::endl;
+	frame_data_list.ReadDataFromFile("../data/lidar_data007.txt");
+	std::cout << "total frame: " << frame_data_list.get_frame_size() << std::endl;
 
 	int count = 0;
-	while (count < frame_data_test.get_frame_size())
+	while (count < frame_data_list.get_frame_size())
 	{
 		//将雷达数据由极坐标系转为直角坐标系
-		LidarDataTransform data_tran_test;
-		data_tran_test.set_lidar_data(frame_data_test.data_list[count]);
+		LidarDataTransform data_trans;
+		data_trans.set_lidar_data(frame_data_list.data_list[count]);
 
 		//过滤密集点
-		//data_tran_test.DataGridFilter(0.05);
+		//data_trans.DataGridFilter(0.05);
 		//降采样
-		//data_tran_test.DataDownSample(2);
+		//data_trans.DataDownSample(2);
 
 		//定义显示图像长和宽
 		const int show_w = 400;
@@ -44,7 +43,7 @@ int main()
 		cv::Mat points_show(show_h, show_w, CV_8UC3);
 		memset(&points_show.data[0], 255, show_h * show_w * 3);
 
-		PointDataFrame data_show_frame = data_tran_test.get_point_data();
+		PointDataFrame data_show_frame = data_trans.get_point_data();
 		for (size_t i = 0; i < data_show_frame.data.size(); i++)
 		{
 			//计算每个像素点的图像坐标

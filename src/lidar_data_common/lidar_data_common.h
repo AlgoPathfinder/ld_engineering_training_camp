@@ -1,10 +1,9 @@
 /*
  * @Author: Ang.Lee.
  * @Date: 2023-07-13 16:52:31
- * @LastEditTime: 2023-08-02 20:50:08
+ * @LastEditTime: 2023-08-10 18:38:16
  * @LastEditors: Ang.Lee.
  * @Description: 
- * @FilePath: \lidar_data_demo_linux\src\lidar_data_common\lidar_data_common.h
  * 
  */
 #pragma once
@@ -29,12 +28,12 @@ struct PointXY
 	float y;
 };
 
-float GetPointDistance(PointXY a, PointXY b)
+inline float GetPointDistance(PointXY a, PointXY b)
 {
 	return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 }
 
-float GetPointDistanceSqr(PointXY a, PointXY b)
+inline float GetPointDistanceSqr(PointXY a, PointXY b)
 {
 	return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
 }
@@ -52,6 +51,8 @@ struct PointDataFrame
 	int64_t time_interval;
 	std::vector<PointXY> data;
 };
+
+
 
 //雷达数据集
 class LidarDataFrameList
@@ -98,7 +99,9 @@ class LidarDataTransform
 private:
 	PointDataFrame point_data;
 	LidarDataFrame lidar_data;
-
+	float RangeMax=12.0f;
+	float RangeMin=0.2f;
+	
 
 
 public:
@@ -121,6 +124,10 @@ public:
 
 		for (size_t i = 0; i < lidar_data.data.size(); i++)
 		{
+			if((lidar_data.data[i].dis>RangeMax)||(lidar_data.data[i].dis<RangeMin))
+			{
+				continue;
+			}
 			PointXY point_tmp;
 			point_tmp.x = lidar_data.data[i].dis * cos(lidar_data.data[i].angle / 180.0 * 3.14159);
 			point_tmp.y = lidar_data.data[i].dis * sin(lidar_data.data[i].angle / 180.0 * 3.14159);
@@ -190,30 +197,6 @@ public:
 
 };
 
-double CalCulatePointDataCost(PointDataFrame first_frame, PointDataFrame new_frame, float x, float y, float rad)
-{
-	double total_value = 0;
-	for (size_t i = 0; i < new_frame.data.size(); i++)
-	{
-		PointXY tran_point;
-		tran_point.x = new_frame.data[i].x * cos(rad) + new_frame.data[i].y * sin(rad) + x;
-		tran_point.y = new_frame.data[i].y * cos(rad) - new_frame.data[i].x * sin(rad) + y;
-
-		float min_dis = 1000;
-		for (size_t j = 0; j < first_frame.data.size(); j++)
-		{
-			float dis = GetPointDistance(tran_point, first_frame.data[j]);
-			if (dis < min_dis)
-			{
-				min_dis = dis;
-			}
-		}
-		total_value += min_dis;
-	}
-	return total_value;
-}
-
-
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -249,4 +232,27 @@ template <class T>
 inline T wrapToPi(T a)//->[-Pi,pi)
 {
 	return wrapTo2Pi(a + static_cast<T>(M_PI)) - static_cast<T>(M_PI);
+}
+
+inline double CalCulatePointDataCost(PointDataFrame first_frame, PointDataFrame new_point_frame, float x, float y, float rad)
+{
+	double total_value = 0;
+	for (size_t i = 0; i < new_point_frame.data.size(); i++)
+	{
+		PointXY tran_point;
+		tran_point.x = new_point_frame.data[i].x * cos(rad) - new_point_frame.data[i].y * sin(rad) + x;
+		tran_point.y = new_point_frame.data[i].y * cos(rad) + new_point_frame.data[i].x * sin(rad) + y;
+
+		float min_dis = 1000;
+		for (size_t j = 0; j < first_frame.data.size(); j++)
+		{
+			float dis = GetPointDistance(tran_point, first_frame.data[j]);
+			if (dis < min_dis)
+			{
+				min_dis = dis;
+			}
+		}
+		total_value += min_dis;
+	}
+	return total_value;
 }

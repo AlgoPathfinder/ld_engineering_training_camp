@@ -30,8 +30,26 @@ endif()
 ## Your package locations should be listed before other locations
 include_directories(
 ${CMAKE_CURRENT_SOURCE_DIR}/src/lidar_data_common/
+${CMAKE_CURRENT_SOURCE_DIR}/src/alg_common/
 ${OpenCV_INCLUDE_DIRS}
 )
+
+include_directories(
+${CMAKE_CURRENT_SOURCE_DIR}/src/ldlidar_driver/include/core/
+${CMAKE_CURRENT_SOURCE_DIR}/src/ldlidar_driver/include/dataprocess/
+${CMAKE_CURRENT_SOURCE_DIR}/src/ldlidar_driver/include/filter/
+${CMAKE_CURRENT_SOURCE_DIR}/src/ldlidar_driver/include/logger/
+${CMAKE_CURRENT_SOURCE_DIR}/src/ldlidar_driver/include/networkcom/
+${CMAKE_CURRENT_SOURCE_DIR}/src/ldlidar_driver/include/serialcom/
+)
+
+file(GLOB  LDLIDAR_DRI_CORE ${CMAKE_CURRENT_SOURCE_DIR}/src/ldlidar_driver/src/core/*.cpp)
+file(GLOB  LDLIDAR_DRI_DATARPC ${CMAKE_CURRENT_SOURCE_DIR}/src/ldlidar_driver/src/dataprocess/*.cpp)
+file(GLOB  LDLIDAR_DRI_FILTER ${CMAKE_CURRENT_SOURCE_DIR}/src/ldlidar_driver/src/filter/*.cpp)
+file(GLOB  LDLIDAR_DRI_LOGGER ${CMAKE_CURRENT_SOURCE_DIR}/src/ldlidar_driver/src/logger/*.cpp)
+file(GLOB  LDLIDAR_DRI_NETWORK ${CMAKE_CURRENT_SOURCE_DIR}/src/ldlidar_driver/src/networkcom/*.cpp)
+file(GLOB  LDLIDAR_DRI_SERIAL ${CMAKE_CURRENT_SOURCE_DIR}/src/ldlidar_driver/src/serialcom/*.cpp)
+
 
 file(GLOB  LDLIDAR_DATA_SHOW ${CMAKE_CURRENT_SOURCE_DIR}/src/lidar_data_show/*.cpp)
 file(GLOB  LDLIDAR_DATA_NAIVE_ROTATION_MATCHING ${CMAKE_CURRENT_SOURCE_DIR}/src/lidar_data_naive_rotation_matching/*.cpp)
@@ -40,9 +58,13 @@ file(GLOB  LDLIDAR_DATA_NAIVE_TRANSLATION_MATCHING ${CMAKE_CURRENT_SOURCE_DIR}/s
 file(GLOB  LDLIDAR_DATA_MATCHING ${CMAKE_CURRENT_SOURCE_DIR}/src/lidar_data_matching/*.cpp)
 file(GLOB  LDLIDAR_DATA_MATCH_POINTS_MAP ${CMAKE_CURRENT_SOURCE_DIR}/src/lidar_data_match_points_map/*.cpp)
 file(GLOB  LDLIDAR_GRID_MAP_MATCHING ${CMAKE_CURRENT_SOURCE_DIR}/src/lidar_grid_map_matching/*.cpp)
-#file(GLOB  GRID_MATCHING_WITH_RTREE ${CMAKE_CURRENT_SOURCE_DIR}/src/grid_matching_with_rtree/*.cpp)
+file(GLOB  GRID_MATCHING_WITH_RTREE ${CMAKE_CURRENT_SOURCE_DIR}/src/grid_matching_with_rtree/*.cpp)
 file(GLOB  PATH_PLANING_WITH_ASTAR ${CMAKE_CURRENT_SOURCE_DIR}/src/path_planing_with_astar/*.cpp)
-#file(GLOB  MAZE_RUNNING_WITH_SLAM_AND_NAVIGATION ${CMAKE_CURRENT_SOURCE_DIR}/src/maze_running_with_slam_and_navigation/*.cpp)
+file(GLOB  PLAY_SOUND ${CMAKE_CURRENT_SOURCE_DIR}/src/play_sound/*.cpp)
+file(GLOB  LD_CAMP ${CMAKE_CURRENT_SOURCE_DIR}/src/ld_camp/*.cpp)
+file(GLOB  ICP_MATCHING ${CMAKE_CURRENT_SOURCE_DIR}/src/icp_matching/*.cpp)
+file(GLOB  ALG_COMMON ${CMAKE_CURRENT_SOURCE_DIR}/src/alg_common/*.cpp)
+file(GLOB  GRID_LOCALIZATION ${CMAKE_CURRENT_SOURCE_DIR}/src/grid_localization/*.cpp)
 
 
 add_executable(lidar_data_show
@@ -69,14 +91,28 @@ add_executable(lidar_grid_map_matching
 	${LDLIDAR_GRID_MAP_MATCHING})
 target_link_libraries(lidar_grid_map_matching ${OpenCV_LIBS})
 
-#add_executable(grid_matching_with_rtree
-#	${GRID_MATCHING_WITH_RTREE})
-#target_link_libraries(grid_matching_with_rtree ${OpenCV_LIBS})
+add_executable(grid_matching_with_rtree
+	${GRID_MATCHING_WITH_RTREE})
+target_link_libraries(grid_matching_with_rtree ${OpenCV_LIBS})
 
 add_executable(path_planing_with_astar
 	${PATH_PLANING_WITH_ASTAR})
 target_link_libraries(path_planing_with_astar ${OpenCV_LIBS})
 
-#add_executable(maze_running_with_slam_and_navigation
-#	${MAZE_RUNNING_WITH_SLAM_AND_NAVIGATION})
-#target_link_libraries(maze_running_with_slam_and_navigation ${OpenCV_LIBS})
+add_executable(play_sound
+	${PLAY_SOUND})
+target_link_libraries(play_sound)
+
+add_executable(grid_localization
+	${GRID_LOCALIZATION})
+target_link_libraries(grid_localization ${OpenCV_LIBS})
+
+add_executable(ld_camp
+	${LD_CAMP})
+target_link_libraries(ld_camp pthread ${OpenCV_LIBS})
+
+add_executable(icp_matching
+	${ICP_MATCHING}
+  ${ALG_COMMON})
+target_link_libraries(icp_matching  ${OpenCV_LIBS})
+

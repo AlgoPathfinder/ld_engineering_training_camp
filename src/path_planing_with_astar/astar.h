@@ -1,10 +1,9 @@
 /*
  * @Author: Ang.Lee.
  * @Date: 2023-07-28 14:45:46
- * @LastEditTime: 2023-08-02 22:19:15
+ * @LastEditTime: 2023-08-17 23:09:43
  * @LastEditors: Ang.Lee.
  * @Description: 
- * @FilePath: \lidar_data_demo_linux\src\path_planing_with_astar\astar.h
  * 
  */
 #pragma once
@@ -21,6 +20,11 @@ struct PathPoint
 	{
 		x = a;
 		y = b;
+	}
+	PathPoint()
+	{
+		x = 0;
+		y = 0;
 	}
 };
 
@@ -61,7 +65,7 @@ protected:
 	float resolution = 0.05;
 	uint8_t obstacle_thr = 127;
 	
-	int expand_level = 50;
+	int expand_level = 20;
 	std::priority_queue<AStarPoint, std::vector<AStarPoint>, std::greater<AStarPoint>> open_list;
 	
 	std::vector<AStarPoint> search_list;
@@ -156,6 +160,10 @@ public:
 					mapdata[index] = 0;
 					expand_point.push_back(PathPoint(j, i));
 				}
+				else if (mapdata[index] < 130)
+				{
+					mapdata[index] = 250;
+				}
 				else
 				{
 					mapdata[index] = 255;
@@ -234,6 +242,10 @@ public:
 					if (mapdata[newindex] > 250)
 					{
 						cost = 0;
+					}
+					else if (mapdata[newindex] ==250)
+					{
+						cost = expand_level*2;
 					}
 					else
 					{

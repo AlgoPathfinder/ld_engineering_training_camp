@@ -1,7 +1,7 @@
 ﻿/*
  * @Author: Ang.Lee.
  * @Date: 2023-07-25 18:01:51
- * @LastEditTime: 2023-08-01 18:00:05
+ * @LastEditTime: 2023-08-17 15:11:56
  * @LastEditors: Ang.Lee.
  * @Description: 
  * @FilePath: \lidar_data_demo_linux\src\lidar_data_match_points_map\lidar_data_match_points_map.cpp
@@ -10,10 +10,10 @@
 
 
 #include <iostream>
-#include "../lidar_data_common/lidar_data_common.h"
+#include "lidar_data_common.h"
 #include <opencv2/opencv.hpp>
-#include "../lidar_data_common/grid_map_2d.h"
-#include "../lidar_data_common/rtree.h"
+#include "grid_map_2d.h"
+#include "rtree.h"
 
 rbox::RTree2f rtree_map;
 
@@ -22,8 +22,8 @@ int InsertFrameToMap(rbox::RTree2f &map, PointDataFrame insert_frame, float x, f
 	for (size_t i = 0; i < insert_frame.data.size(); i++)
 	{
 		PointXY tran_point;
-		tran_point.x = insert_frame.data[i].x * cos(rad) + insert_frame.data[i].y * sin(rad) + x;
-		tran_point.y = insert_frame.data[i].y * cos(rad) - insert_frame.data[i].x * sin(rad) + y;
+		tran_point.x = insert_frame.data[i].x * cos(rad) - insert_frame.data[i].y * sin(rad) + x;
+		tran_point.y = insert_frame.data[i].y * cos(rad) + insert_frame.data[i].x * sin(rad) + y;
 		float ins_point[2];
 		ins_point[0] = tran_point.x;
 		ins_point[1] = tran_point.y;
@@ -32,21 +32,21 @@ int InsertFrameToMap(rbox::RTree2f &map, PointDataFrame insert_frame, float x, f
 	return 0;
 }
 
-double CalculatePointDataCostWithRTree(rbox::RTree2f& map, PointDataFrame new_frame, float x, float y, float rad)
+double CalculatePointDataCostWithRTree(rbox::RTree2f& map, PointDataFrame new_point_frame, float x, float y, float rad)
 {
 	double total_value = 0;
-	for (size_t i = 0; i < new_frame.data.size(); i++)
+	for (size_t i = 0; i < new_point_frame.data.size(); i++)
 	{
 		PointXY tran_point;
-		tran_point.x = new_frame.data[i].x * cos(rad) + new_frame.data[i].y * sin(rad) + x;
-		tran_point.y = new_frame.data[i].y * cos(rad) - new_frame.data[i].x * sin(rad) + y;
+		tran_point.x = new_point_frame.data[i].x * cos(rad) - new_point_frame.data[i].y * sin(rad) + x;
+		tran_point.y = new_point_frame.data[i].y * cos(rad) + new_point_frame.data[i].x * sin(rad) + y;
 		
 		float knn_point[2];
 		knn_point[0] = tran_point.x;
 		knn_point[1] = tran_point.y;
 		
 		std::vector<float> dis;
-		map.KNN(knn_point, 1, dis);
+		map.NearstWithDis(knn_point, dis);
 
 		total_value += dis[0];
 	}
@@ -55,13 +55,13 @@ double CalculatePointDataCostWithRTree(rbox::RTree2f& map, PointDataFrame new_fr
 
 int main()
 {
-	LidarDataFrameList frame_data_test;
-	frame_data_test.ReadDataFromFile("../data/lidar_data008.txt");
-	std::cout << "total frame: " << frame_data_test.get_frame_size() << std::endl;
+	LidarDataFrameList frame_data_list;
+	frame_data_list.ReadDataFromFile("../data/lidar_data008.txt");
+	std::cout << "total frame: " << frame_data_list.get_frame_size() << std::endl;
 
 	int count = 0;
 
-	PointDataFrame new_frame;
+	PointDataFrame new_point_frame;
 	PointDataFrame last_frame;
 
 	double car_x = 0;
@@ -81,24 +81,27 @@ int main()
 	memset(&points_show.data[0], 255, show_h * show_w * 3);
 
 
-	while (count < frame_data_test.get_frame_size())
+	while (count < frame_data_list.get_frame_size())
 	{
 
-		LidarDataTransform data_tran_test;
-		data_tran_test.set_lidar_data(frame_data_test.data_list[count]);
-		data_tran_test.DataGridFilter(0.1);
-		data_tran_test.DataDownSample(3);
-		//data_tran_test.CutData(0.7);
+		LidarDataTransform data_trans;
+		data_trans.set_lidar_data(frame_data_list.data_list[count]);
+
+        PointDataFrame insert_frame=data_trans.get_point_data();
 
 		if (count == 0)
 		{
-			last_frame = data_tran_test.get_point_data();
+			last_frame = insert_frame;
 			count++;
-			InsertFrameToMap(rtree_map, last_frame, 0, 0, 0);
+			InsertFrameToMap(rtree_map, insert_frame, 0, 0, 0);
 			continue;
 		}
 
-		new_frame = data_tran_test.get_point_data();
+		data_trans.DataGridFilter(0.1);
+		data_trans.DataDownSample(3);
+		//data_trans.CutData(0.7);
+
+		new_point_frame = data_trans.get_point_data();
 
 		int step = 1;
 		float xy_step = 0.1;
@@ -153,7 +156,7 @@ int main()
 					break;
 				}
 
-				double cost_value = CalculatePointDataCostWithRTree(rtree_map, new_frame, new_x, new_y, new_a);
+				double cost_value = CalculatePointDataCostWithRTree(rtree_map, new_point_frame, new_x, new_y, new_a);
 				if (cost_value < min_value)
 				{
 					dst_x = new_x;
@@ -180,17 +183,16 @@ int main()
 		std::cout << "x= " << car_x << "	y= " << car_y << "	a= " << car_a << std::endl;
 
 		//LidarDataTransform lidar_grid_update;
-		//lidar_grid_update.set_lidar_data(frame_data_test.data_list[count]);
+		//lidar_grid_update.set_lidar_data(frame_data_list.data_list[count]);
 
 		//grid_map.UpdataMap(lidar_grid_update.get_point_data(), car_x, car_y, car_a);
 
 
 		if (((abs(car_x - last_insert_x) + abs(car_y - last_insert_y)) > 0.2) || (abs(car_a - last_insert_a) > 0.5))
 		{
-			InsertFrameToMap(rtree_map, new_frame, car_x, car_y, car_a);
-			LidarDataTransform lidar_grid_update;
-			lidar_grid_update.set_lidar_data(frame_data_test.data_list[count]);
-			grid_map.UpdataMap(lidar_grid_update.get_point_data(), car_x, car_y, car_a);
+			InsertFrameToMap(rtree_map, new_point_frame, car_x, car_y, car_a);
+
+			grid_map.UpdataMap(insert_frame, car_x, car_y, car_a);
 
 			last_insert_x = car_x;
 			last_insert_y = car_y;
@@ -207,11 +209,11 @@ int main()
 			cv::circle(points_show, cv::Point(idx_x, idx_y), 1, cv::Scalar(255, 0, 0));
 		}
 
-		for (size_t i = 0; i < new_frame.data.size(); i++)
+		for (size_t i = 0; i < new_point_frame.data.size(); i++)
 		{
-			int idx_x = (new_frame.data[i].x * cos(car_a) + new_frame.data[i].y * sin(car_a) + car_x) * 15;
+			int idx_x = (new_point_frame.data[i].x * cos(car_a) - new_point_frame.data[i].y * sin(car_a) + car_x) * 15;
 			idx_x = idx_x + show_w / 2;
-			int idx_y = (new_frame.data[i].y * cos(car_a) - new_frame.data[i].x * sin(car_a) + car_y) * 15;
+			int idx_y = (new_point_frame.data[i].y * cos(car_a) + new_point_frame.data[i].x * sin(car_a) + car_y) * 15;
 			idx_y = -idx_y + show_h / 2;
 			if ((idx_x < show_w) && (idx_y < show_h) && (idx_x >= 0) && (idx_y >= 0))
 			{
@@ -228,7 +230,7 @@ int main()
 		cv::imshow("trojectory", points_show);
 		cv::waitKey(1);
 
-		last_frame = new_frame;
+		last_frame = new_point_frame;
 		count++;
 	}
 	return 0;
