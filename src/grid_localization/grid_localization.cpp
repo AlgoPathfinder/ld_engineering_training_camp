@@ -1,7 +1,7 @@
 ﻿/*
  * @Author: Ang.Lee.
  * @Date: 2023-07-24 18:03:03
- * @LastEditTime: 2023-08-17 23:59:07
+ * @LastEditTime: 2023-08-18 14:10:41
  * @LastEditors: Ang.Lee.
  * @Description:
  * @FilePath: \lidar_data_demo_linux\src\grid_localization\grid_localization.cpp
@@ -15,13 +15,12 @@
 int main()
 {
 	LidarDataFrameList frame_data_test;
-	frame_data_test.ReadDataFromFile("../data/lidar_data008.txt");
+	frame_data_test.ReadDataFromFile("../data/lidar_data007.txt");
 	std::cout << "total frame: " << frame_data_test.get_frame_size() << std::endl;
 
 	int count = 0;
 
 	PointDataFrame new_point_frame;
-	PointDataFrame last_frame;
 
 	double car_x = 0;
 	double car_y = 0;
@@ -50,24 +49,26 @@ int main()
 	while (count < frame_data_test.get_frame_size())
 	{
 
-		LidarDataTransform data_tran_test;
-		data_tran_test.set_lidar_data(frame_data_test.data_list[count]);
-		data_tran_test.DataGridFilter(0.1);
-		//data_tran_test.DataDownSample(2);
-		//data_tran_test.CutData(0.7);
+		LidarDataTransform data_trans;
+		data_trans.set_lidar_data(frame_data_test.data_list[count]);
+		
+        PointDataFrame insert_frame=data_trans.get_point_data();
 
-		if (count == 0)
-		{
-			last_frame = data_tran_test.get_point_data();
-			count++;
-			for (int i = 0; i < 10; i++)
-			{
-				grid_map.UpdataMap(last_frame, 0, 0, 0);
-			}
-			continue;
-		}
+		// if (count == 0)
+		// {
+		// 	count++;
+		// 	for (int i = 0; i < 10; i++)
+		// 	{
+		// 		grid_map.UpdataMap(insert_frame, 0, 0, 0);
+		// 	}
+		// 	continue;
+		// }
 
-		new_point_frame = data_tran_test.get_point_data();
+		data_trans.DataGridFilter(0.1);
+		//data_trans.DataDownSample(2);
+		//data_trans.CutData(0.7);
+
+		new_point_frame = data_trans.get_point_data();
 
 		int step = 1;
 		float xy_step = 0.06;
@@ -151,9 +152,7 @@ int main()
 
 		if (((abs(car_x - last_insert_x) + abs(car_y - last_insert_y)) > 0.2) || (abs(car_a - last_insert_a) > 0.3))
 		{
-			LidarDataTransform lidar_grid_update;
-			lidar_grid_update.set_lidar_data(frame_data_test.data_list[count]);
-			grid_map.UpdataMap(lidar_grid_update.get_point_data(), car_x, car_y, car_a);
+			//grid_map.UpdataMap(insert_frame, car_x, car_y, car_a);
 
 			last_insert_x = car_x;
 			last_insert_y = car_y;
@@ -191,7 +190,6 @@ int main()
 		cv::imshow("trojectory", points_show);
 		cv::waitKey(1);
 
-		last_frame = new_point_frame;
 		count++;
 	}
 	return 0;
