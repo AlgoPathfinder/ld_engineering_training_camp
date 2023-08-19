@@ -1,7 +1,7 @@
 /*
  * @Author: Ang.Lee.
  * @Date: 2023-08-02 10:55:50
- * @LastEditTime: 2023-08-19 13:41:26
+ * @LastEditTime: 2023-08-19 14:09:37
  * @LastEditors: Ang.Lee.
  * @Description: 
  * 
@@ -115,27 +115,22 @@ int main()
 
         }
 
-		int idx_x = car_x * 15;
-		idx_x = idx_x + show_w / 2;
-		int idx_y = car_y * 15;
-		idx_y = -idx_y + show_h / 2;
+
+		memcpy(&grid_show.data[0], grid_map.get_map(), grid_map.get_w() * grid_map.get_h());
+
+		int idx_x =  grid_map.x_to_idx(car_x);
+		int idx_y = grid_map.y_to_idy(car_y);
+
+		float car_top_x = 0.8 * cos(car_a) - 0 * sin(car_a) + car_x;
+		float car_top_y = 0 * cos(car_a) + 0.8 * sin(car_a) + car_y;
+
+		int cat_top_idx_x = grid_map.x_to_idx(car_top_x);
+		int cat_top_idx_y = grid_map.y_to_idy(car_top_y);
 
 		if ((idx_x < show_w) && (idx_y < show_h) && (idx_x >= 0) && (idx_y >= 0))
 		{
-			cv::circle(points_show, cv::Point(idx_x, idx_y), 1, cv::Scalar(255, 0, 0));
-		}
-
-		for (size_t i = 0; i < new_point_frame.data.size(); i++)
-		{
-			int idx_x = (new_point_frame.data[i].x * cos(car_a) - new_point_frame.data[i].y * sin(car_a) + car_x) * 15;
-			idx_x = idx_x + show_w / 2;
-			int idx_y = (new_point_frame.data[i].y * cos(car_a) + new_point_frame.data[i].x * sin(car_a) + car_y) * 15;
-			idx_y = -idx_y + show_h / 2;
-			if ((idx_x < show_w) && (idx_y < show_h) && (idx_x >= 0) && (idx_y >= 0))
-			{
-				cv::circle(points_show, cv::Point(idx_x, idx_y), 1, cv::Scalar(0, 0, 255));
-			}
-
+			cv::circle(grid_show, cv::Point(idx_x, idx_y), 5, cv::Scalar(0));
+			cv::line(grid_show, cv::Point(idx_x, idx_y), cv::Point(cat_top_idx_x, cat_top_idx_y), cv::Scalar(0), 1);
 		}
 
 		cv::flip(grid_show, grid_show, 0);
