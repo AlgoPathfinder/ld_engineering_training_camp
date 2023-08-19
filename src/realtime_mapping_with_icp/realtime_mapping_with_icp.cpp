@@ -88,8 +88,8 @@ int main()
 
 		new_point_frame = data_trans.get_point_data();
 
-		Pose2D robot_pre_pose(car_x + (car_x - last_x), car_y + (car_y - last_y), car_a + (car_a - last_a));
-		//Pose2D robot_pre_pose(car_x, car_y, car_a);
+		//Pose2D robot_pre_pose(car_x + (car_x - last_x), car_y + (car_y - last_y), car_a + (car_a - last_a));
+		Pose2D robot_pre_pose(car_x, car_y, car_a);
 
         Pose2D slam_pose;
         int good_ness=0;
