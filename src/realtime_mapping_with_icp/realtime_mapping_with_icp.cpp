@@ -1,7 +1,7 @@
 /*
  * @Author: Ang.Lee.
  * @Date: 2023-08-02 10:55:50
- * @LastEditTime: 2023-08-19 14:27:34
+ * @LastEditTime: 2023-08-19 14:33:36
  * @LastEditors: Ang.Lee.
  * @Description: 
  * 
@@ -114,7 +114,6 @@ int main()
 			last_insert_x = car_x;
 			last_insert_y = car_y;
 			last_insert_a = car_a;
-
         }
 
 		memcpy(&grid_show.data[0], grid_map.get_map(), grid_map.get_w() * grid_map.get_h());
@@ -128,12 +127,12 @@ int main()
 		int cat_top_idx_x = grid_map.x_to_idx(car_top_x);
 		int cat_top_idx_y = grid_map.y_to_idy(car_top_y);
 
-		if ((idx_x < show_w) && (idx_y < show_h) && (idx_x >= 0) && (idx_y >= 0))
 		{
 			cv::circle(grid_show, cv::Point(idx_x, idx_y), 5, cv::Scalar(0));
 			cv::line(grid_show, cv::Point(idx_x, idx_y), cv::Point(cat_top_idx_x, cat_top_idx_y), cv::Scalar(0), 1);
 		}
 
+		memset(&points_show.data[0], 255, show_h * show_w * 3);
 		float to_map_scale=15.0f;
 		for (size_t i = 0; i < insert_frame.data.size(); i++)
 		{
