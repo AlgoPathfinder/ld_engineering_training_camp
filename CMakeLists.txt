@@ -65,6 +65,8 @@ file(GLOB  LD_CAMP ${CMAKE_CURRENT_SOURCE_DIR}/src/ld_camp/*.cpp)
 file(GLOB  ICP_MATCHING ${CMAKE_CURRENT_SOURCE_DIR}/src/icp_matching/*.cpp)
 file(GLOB  ALG_COMMON ${CMAKE_CURRENT_SOURCE_DIR}/src/alg_common/*.cpp)
 file(GLOB  GRID_LOCALIZATION ${CMAKE_CURRENT_SOURCE_DIR}/src/grid_localization/*.cpp)
+file(GLOB  REALTIME_MAPPING ${CMAKE_CURRENT_SOURCE_DIR}/src/realtime_mapping/*.cpp)
+file(GLOB  REALTIME_MAPPING_WITH_ICP ${CMAKE_CURRENT_SOURCE_DIR}/src/realtime_mapping_with_icp/*.cpp)
 
 
 add_executable(lidar_data_show
@@ -115,4 +117,27 @@ add_executable(icp_matching
 	${ICP_MATCHING}
   ${ALG_COMMON})
 target_link_libraries(icp_matching  ${OpenCV_LIBS})
+
+add_executable(realtime_mapping
+	${REALTIME_MAPPING}
+  ${LDLIDAR_DRI_CORE} 
+  ${LDLIDAR_DRI_DATARPC} 
+  ${LDLIDAR_DRI_FILTER} 
+  ${LDLIDAR_DRI_LOGGER} 
+  ${LDLIDAR_DRI_NETWORK} 
+  ${LDLIDAR_DRI_SERIAL}
+  ${ALG_COMMON})
+target_link_libraries(realtime_mapping pthread ${OpenCV_LIBS})
+
+add_executable(realtime_mapping_with_icp
+	${REALTIME_MAPPING_WITH_ICP}
+  ${LDLIDAR_DRI_CORE} 
+  ${LDLIDAR_DRI_DATARPC} 
+  ${LDLIDAR_DRI_FILTER} 
+  ${LDLIDAR_DRI_LOGGER} 
+  ${LDLIDAR_DRI_NETWORK} 
+  ${LDLIDAR_DRI_SERIAL}
+  ${ALG_COMMON})
+target_link_libraries(realtime_mapping_with_icp pthread ${OpenCV_LIBS})
+
 
