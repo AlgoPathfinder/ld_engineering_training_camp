@@ -1,7 +1,7 @@
 /*
  * @Author: Ang.Lee.
  * @Date: 2023-08-02 10:55:50
- * @LastEditTime: 2023-08-19 14:09:37
+ * @LastEditTime: 2023-08-19 14:27:34
  * @LastEditors: Ang.Lee.
  * @Description: 
  * 
@@ -76,6 +76,8 @@ int main()
 		{
             Pose2D insert_pose(0, 0, 0);
             points_map.InsertObservation(&insert_pose,&insert_frame);
+			grid_map.UpdataMap(insert_frame, 0, 0, 0);
+
 			count++;
 			continue;
 		}
@@ -115,7 +117,6 @@ int main()
 
         }
 
-
 		memcpy(&grid_show.data[0], grid_map.get_map(), grid_map.get_w() * grid_map.get_h());
 
 		int idx_x =  grid_map.x_to_idx(car_x);
@@ -133,15 +134,31 @@ int main()
 			cv::line(grid_show, cv::Point(idx_x, idx_y), cv::Point(cat_top_idx_x, cat_top_idx_y), cv::Scalar(0), 1);
 		}
 
+		float to_map_scale=15.0f;
+		for (size_t i = 0; i < insert_frame.data.size(); i++)
+		{
+			//计算每个像素点的图像坐标
+			int idx_x = insert_frame.data[i].x *to_map_scale;
+			idx_x = idx_x + show_w / 2;
+			int idx_y = insert_frame.data[i].y *to_map_scale;
+			idx_y = -idx_y + show_h / 2;
+
+			if ((idx_x < show_w) && (idx_y < show_h) && (idx_x >= 0) && (idx_y >= 0))
+			{
+				cv::circle(points_show, cv::Point(idx_x, idx_y), 1, cv::Scalar(0, 0, 255));
+			}
+		}
+
 		cv::flip(grid_show, grid_show, 0);
 		//cv::Mat small_grid_show;
 		//cv::resize(grid_show, small_grid_show, cv::Size(grid_show.cols / 2, grid_show.rows / 2));
 		cv::imshow("grid_map", grid_show);
 
-		cv::imshow("trojectory", points_show);
+		cv::imshow("lidar_data", points_show);
 		cv::waitKey(1);
 		//usleep(1000); 
 		count++;
 	}
+	
 	return 0;
 }
